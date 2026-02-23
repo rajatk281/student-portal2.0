@@ -3,9 +3,9 @@ import Spline from '@splinetool/react-spline/next';
 
 const page = () => {
   return (
-    <div className='h-screen relative fit-content
+    <div className='h-screen relative fit-content overflow-hidden
     '>
-      <Spline
+      <Spline 
         scene="https://prod.spline.design/nNegvrD05qJqxbqk/scene.splinecode"
       />
       <div className='absolute top-4/5 left-1/2 -translate-x-1/2 -translate-y-1/2 
@@ -44,6 +44,9 @@ const page = () => {
   <p className="mt-4 text-neutral-400 text-sm font-medium tracking-wide uppercase">
     Powered by AI Intelligence
   </p>
+</div>
+<div className='top-0 absolute p-4 text-2xl font-bold'>
+  NEXORA
 </div>
     </div>
   )
