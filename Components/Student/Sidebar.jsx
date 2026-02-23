@@ -1,9 +1,12 @@
+"use client";
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   {
+    href: "/student",
     label: "Dashboard",
-    active: true,
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
         <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor" />
@@ -14,6 +17,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/vault",
     label: "Vault",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -24,6 +28,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/attendance",
     label: "Attendance",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -32,6 +37,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/assignment",
     label: "Assignment",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -41,6 +47,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/study-planner",
     label: "Study Planner",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -50,6 +57,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/performance",
     label: "Performance",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -58,6 +66,7 @@ const navItems = [
     ),
   },
   {
+    href: "/student/leaderboard",
     label: "Leaderboard",
     icon: (
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -70,6 +79,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="flex flex-col w-52 min-h-screen bg-[#0e0e0e] border-r border-white/5 py-6 px-3 shrink-0">
       {/* Logo */}
@@ -79,26 +90,32 @@ export default function Sidebar() {
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <span className="text-white font-bold tracking-widest text-xl">NEXORA</span>
+        <Link href='/student'><span className="text-white font-bold tracking-widest text-xl">NEXORA</span></Link> 
       </div>
 
       {/* Nav */}
       <nav className="flex flex-col gap-1 flex-1">
-        {navItems.map((item) => (
-          <button
-            key={item.label}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full text-left
-              ${item.active
-                ? "bg-white/10 text-white border-l-2 border-white"
-                : "text-white/40 hover:text-white/70 hover:bg-white/5"
-              }`}
-          >
-            <span className={item.active ? "text-white" : "text-white/40"}>
-              {item.icon}
-            </span>
-            {item.label}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const isActive = item.href === "/student"
+            ? pathname === "/student"
+            : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full text-left
+                ${isActive
+                  ? "bg-white/10 text-white border-l-2 border-white"
+                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                }`}
+            >
+              <span className={isActive ? "text-white" : "text-white/40"}>
+                {item.icon}
+              </span>
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Concierge */}
