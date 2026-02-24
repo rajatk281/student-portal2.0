@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import ContributionGraph from "./GithubConsistency";
 
 const progressionData = [
   { month: "JAN", value: 55 },
@@ -89,6 +90,42 @@ const ActiveDot = (props) => {
   );
 };
 
+const STUDY_RECORDS = [
+  // Recent days
+  { date: "2026-02-24", hours: 5 },
+  { date: "2026-02-23", hours: 2 },
+  { date: "2026-02-22", hours: 8 },
+  { date: "2026-02-21", hours: 4 },
+  { date: "2026-02-20", hours: 6 },
+  { date: "2026-02-19", hours: 1 },
+  { date: "2026-02-18", hours: 0 },
+
+  // Last week
+  { date: "2026-02-17", hours: 3 },
+  { date: "2026-02-16", hours: 5 },
+  { date: "2026-02-15", hours: 7 },
+  { date: "2026-02-14", hours: 2 },
+  { date: "2026-02-13", hours: 4 },
+  { date: "2026-02-12", hours: 5 },
+  { date: "2026-02-11", hours: 6 },
+
+  // Week before last
+  { date: "2026-02-10", hours: 2 },
+  { date: "2026-02-09", hours: 1 },
+  { date: "2026-02-08", hours: 9 },
+  { date: "2026-02-07", hours: 4 },
+  { date: "2026-02-06", hours: 3 },
+  { date: "2026-02-05", hours: 5 },
+  { date: "2026-02-04", hours: 2 },
+
+  // Scattered older dates
+  { date: "2026-01-25", hours: 6 },
+  { date: "2026-01-20", hours: 4 },
+  { date: "2026-01-15", hours: 8 },
+  { date: "2025-12-25", hours: 2 },
+  { date: "2025-12-01", hours: 5 },
+];
+
 export default function MainContent() {
   return (
     <main className="flex-1 flex flex-col gap-5 px-8 pb-8 overflow-auto pt-24">
@@ -160,7 +197,7 @@ export default function MainContent() {
       {/* Bottom row */}
       <div className="flex gap-4 flex-1 min-h-0">
         {/* Chart */}
-        <div className="flex-1 bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col">
+        {/* <div className="flex-1 bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h2 className="text-white font-bold text-lg">Progression Analysis</h2>
@@ -211,7 +248,8 @@ export default function MainContent() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
+        <ContributionGraph studyRecords={STUDY_RECORDS} />
 
         {/* Right column */}
         <div className="flex flex-col gap-4 w-64">

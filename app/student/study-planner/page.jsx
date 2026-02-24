@@ -1,8 +1,11 @@
+import AIStudyDashboard from '@/Components/Student/StudyPlannerContent'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+      <AIStudyDashboard/>
+    </div>
   )
 }
 
