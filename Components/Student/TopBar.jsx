@@ -1,8 +1,8 @@
 import React from "react";
 
-export default function TopBar() {
+export default function TopBar({ isSidebarCollapsed }) {
   return (
-    <header className="flex w-6/7 fixed top-0 right-0 items-start justify-between px-8 pt-5 pb-4">
+    <header className={`flex fixed top-0 right-0 items-start justify-between px-8 pt-5 pb-4 transition-all duration-300 z-40 ${isSidebarCollapsed ? 'left-20' : 'left-52'}`}>
       {/* Left: greeting */}
       <div>
         <h1 className="text-white text-3xl font-bold tracking-tight">

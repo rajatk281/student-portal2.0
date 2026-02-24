@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChevronLeft, ChevronRight, HelpCircle } from "lucide-react";
 
 const navItems = [
   {
@@ -78,19 +79,31 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isCollapsed, onToggle }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex flex-col w-52 min-h-screen bg-[#0e0e0e] border-r border-white/5 py-6 px-3 shrink-0">
+    <aside className={`fixed top-0 left-0 flex flex-col h-screen bg-[#0e0e0e] border-r border-white/5 py-6 px-3 shrink-0 transition-all duration-300 z-50 ${isCollapsed ? "w-20" : "w-52"}`}>
+      {/* Toggle Button */}
+      <button
+        onClick={onToggle}
+        className="absolute -right-3 top-20 w-6 h-6 bg-white rounded-full flex items-center justify-center text-black border border-white/10 shadow-lg hover:scale-110 transition-transform"
+      >
+        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
+
       {/* Logo */}
-      <div className="flex items-center gap-2 px-3 mb-10">
-        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+      <div className={`flex items-center gap-2 px-3 mb-10 transition-all duration-300 ${isCollapsed ? "justify-center" : ""}`}>
+        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <Link href='/student'><span className="text-white font-bold tracking-widest text-xl">NEXORA</span></Link> 
+        {!isCollapsed && (
+          <Link href='/student'>
+            <span className="text-white font-bold tracking-widest text-xl animate-in fade-in duration-300">NEXORA</span>
+          </Link>
+        )}
       </div>
 
       {/* Nav */}
@@ -103,27 +116,33 @@ export default function Sidebar() {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full text-left
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full
+                ${isCollapsed ? "justify-center" : "text-left"}
                 ${isActive
                   ? "bg-white/10 text-white border-l-2 border-white"
                   : "text-white/40 hover:text-white/70 hover:bg-white/5"
                 }`}
+              title={isCollapsed ? item.label : ""}
             >
-              <span className={isActive ? "text-white" : "text-white/40"}>
+              <span className={`shrink-0 transition-colors ${isActive ? "text-white" : "text-white/40"}`}>
                 {item.icon}
               </span>
-              {item.label}
+              {!isCollapsed && <span className="animate-in slide-in-from-left-2 fade-in duration-300">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
       {/* Concierge */}
-      <div className="mt-6 px-2">
-        <p className="text-[10px] text-white/30 tracking-widest mb-2 px-1">CONCIERGE</p>
-        <button className="w-full border border-white/20 text-white text-xs font-semibold tracking-widest py-2.5 rounded-lg hover:bg-white/5 transition-colors">
-          REQUEST HELP
-        </button>
+      <div className={`mt-6 px-2 transition-all duration-300 ${isCollapsed ? "opacity-0" : "opacity-100"}`}>
+        {!isCollapsed && (
+          <>
+            <p className="text-[10px] text-white/30 tracking-widest mb-2 px-1">CONCIERGE</p>
+            <button className="w-full border border-white/20 text-white text-xs font-semibold tracking-widest py-2.5 rounded-lg hover:bg-white/5 transition-colors">
+              REQUEST HELP
+            </button>
+          </>
+        )}
       </div>
     </aside>
   );
