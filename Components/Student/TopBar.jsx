@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TopBar() {
   return (
-    <header className="flex w-6/7  fixed top-0 right-0 items-start justify-between px-8 pt-7 pb-4">
+    <header className="flex w-6/7 fixed top-0 right-0 items-start justify-between px-8 pt-5 pb-4">
       {/* Left: greeting */}
       <div>
         <h1 className="text-white text-3xl font-bold tracking-tight">

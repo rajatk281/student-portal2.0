@@ -1,9 +1,11 @@
+
+import AssignmentsPage from '@/Components/Student/AssignmentContent'
 import React from 'react'
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
+    return (
+        <AssignmentsPage/>
+    )
 }
 
 export default page

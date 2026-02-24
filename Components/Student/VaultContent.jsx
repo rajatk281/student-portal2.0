@@ -181,7 +181,7 @@ export default function VaultPage() {
 
     return (
         <div
-            className="flex-1 text-white p-6 px-8 font-sans pt-24 h-screen"
+            className="flex-1 flex flex-col text-white p-6 px-8 font-sans pt-24 h-screen overflow-hidden"
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={onDrop}
@@ -193,7 +193,7 @@ export default function VaultPage() {
                 </div>
             )}
 
-            <div className="max-w-4xl mx-auto flex flex-col gap-6">
+            <div className=" mx-auto flex flex-col gap-4 flex-1 min-h-0 w-full">
 
                 {/* ── Search bar ── */}
                 <div className="relative">
@@ -229,8 +229,8 @@ export default function VaultPage() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-widest transition-all ${activeTab === tab
-                                        ? "bg-white text-black"
-                                        : "text-white/35 hover:text-white/60"
+                                    ? "bg-white text-black"
+                                    : "text-white/35 hover:text-white/60"
                                     }`}
                             >
                                 {tab}
@@ -329,7 +329,7 @@ export default function VaultPage() {
                 </section>
 
                 {/* ── Recent Files ── */}
-                <section>
+                <section className="flex-1 min-h-0 flex flex-col">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[11px] tracking-[0.2em] text-white/35 font-bold">
                             RECENT FILES
@@ -364,51 +364,92 @@ export default function VaultPage() {
                         </div>
                     </div>
 
-                    {filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 text-white/20">
-                            <span className="text-5xl mb-4">🔍</span>
-                            <p className="text-sm">No files found for "{search}"</p>
-                        </div>
-                    ) : viewGrid ? (
-                        /* Grid view */
-                        <div className="grid grid-cols-3 gap-4">
-                            {filtered.map((file) => {
-                                const cfg = FILE_TYPES[file.ext] || FILE_TYPES.default;
-                                return (
-                                    <div
-                                        key={file.id}
-                                        className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group"
-                                    >
-                                        {/* Header */}
-                                        <div className="flex items-center gap-3">
-                                            <FileIcon ext={file.ext} />
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-white text-sm font-semibold truncate">{file.name}</p>
-                                                <div className="flex items-center gap-1.5 mt-1">
-                                                    {file.tag && <TagBadge tag={file.tag} />}
+                    <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+                        {filtered.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 text-white/20">
+                                <span className="text-5xl mb-4">🔍</span>
+                                <p className="text-sm">No files found for "{search}"</p>
+                            </div>
+                        ) : viewGrid ? (
+                            /* Grid view */
+                            <div className="grid grid-cols-3 gap-4">
+                                {filtered.map((file) => {
+                                    const cfg = FILE_TYPES[file.ext] || FILE_TYPES.default;
+                                    return (
+                                        <div
+                                            key={file.id}
+                                            className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group"
+                                        >
+                                            {/* Header */}
+                                            <div className="flex items-center gap-3">
+                                                <FileIcon ext={file.ext} />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-white text-sm font-semibold truncate">{file.name}</p>
+                                                    <div className="flex items-center gap-1.5 mt-1">
+                                                        {file.tag && <TagBadge tag={file.tag} />}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className="text-white/25 text-[11px] tracking-wider">
+                                                ADDED {file.date} • {file.size}
+                                            </p>
+                                            {/* Footer */}
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex -space-x-2">
+                                                    {file.avatars.slice(0, 3).map((av, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className={`w-7 h-7 rounded-full ${getAvatarColor(av)} flex items-center justify-center text-[10px] font-bold text-white border-2 border-[#111]`}
+                                                        >
+                                                            {av}
+                                                        </div>
+                                                    ))}
+                                                    {file.extra > 0 && (
+                                                        <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/60 border-2 border-[#111]">
+                                                            +{file.extra}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                    <button className="text-white/30 hover:text-white transition-colors">
+                                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                            <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                            <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                        </svg>
+                                                    </button>
+                                                    <button className="text-white/30 hover:text-white transition-colors">
+                                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                                            <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.8" />
+                                                            <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                                                            <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.8" />
+                                                            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" strokeWidth="1.8" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <p className="text-white/25 text-[11px] tracking-wider">
-                                            ADDED {file.date} • {file.size}
-                                        </p>
-                                        {/* Footer */}
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex -space-x-2">
-                                                {file.avatars.slice(0, 3).map((av, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={`w-7 h-7 rounded-full ${getAvatarColor(av)} flex items-center justify-center text-[10px] font-bold text-white border-2 border-[#111]`}
-                                                    >
-                                                        {av}
-                                                    </div>
-                                                ))}
-                                                {file.extra > 0 && (
-                                                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/60 border-2 border-[#111]">
-                                                        +{file.extra}
-                                                    </div>
-                                                )}
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            /* List view */
+                            <div className="flex flex-col gap-2">
+                                {filtered.map((file) => {
+                                    const cfg = FILE_TYPES[file.ext] || FILE_TYPES.default;
+                                    return (
+                                        <div
+                                            key={file.id}
+                                            className="bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group"
+                                        >
+                                            <FileIcon ext={file.ext} size="sm" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-white text-sm font-semibold truncate">{file.name}</p>
+                                                <p className="text-white/25 text-[11px] tracking-wider mt-0.5">
+                                                    ADDED {file.date} • {file.size}
+                                                </p>
                                             </div>
+                                            {file.tag && <TagBadge tag={file.tag} />}
                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                 <button className="text-white/30 hover:text-white transition-colors">
                                                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
@@ -427,50 +468,11 @@ export default function VaultPage() {
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        /* List view */
-                        <div className="flex flex-col gap-2">
-                            {filtered.map((file) => {
-                                const cfg = FILE_TYPES[file.ext] || FILE_TYPES.default;
-                                return (
-                                    <div
-                                        key={file.id}
-                                        className="bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group"
-                                    >
-                                        <FileIcon ext={file.ext} size="sm" />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-white text-sm font-semibold truncate">{file.name}</p>
-                                            <p className="text-white/25 text-[11px] tracking-wider mt-0.5">
-                                                ADDED {file.date} • {file.size}
-                                            </p>
-                                        </div>
-                                        {file.tag && <TagBadge tag={file.tag} />}
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                            <button className="text-white/30 hover:text-white transition-colors">
-                                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                                                    <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                                                    <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                                                </svg>
-                                            </button>
-                                            <button className="text-white/30 hover:text-white transition-colors">
-                                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                                    <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                    <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                    <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                    <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" strokeWidth="1.8" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </section>
             </div>
         </div>
