@@ -15,5 +15,5 @@ export default function StudentLayout({ children }) {
       </div>
     </div>
   );
-}
+} 
 
