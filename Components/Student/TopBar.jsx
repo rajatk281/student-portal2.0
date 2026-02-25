@@ -1,4 +1,5 @@
 import React from "react";
+import { UserAvatar, UserName } from "./Avatar";
 
 export default function TopBar({ isSidebarCollapsed }) {
   return (
@@ -65,15 +66,11 @@ export default function TopBar({ isSidebarCollapsed }) {
         {/* Profile */}
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-white text-sm font-semibold leading-tight">Rajat Kapoor</p>
+            <p className="text-white text-sm font-semibold leading-tight"><UserName/></p>
             <p className="text-white/40 text-xs">PHD CANDIDATE</p>
           </div>
           <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white/20">
-            <img
-              src="https://i.pravatar.cc/40?img=11"
-              alt="Rajat Kapoor"
-              className="w-full h-full object-cover"
-            />
+            <UserAvatar/>
           </div>
         </div>
       </div>
