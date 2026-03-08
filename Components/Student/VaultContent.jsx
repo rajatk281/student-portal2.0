@@ -2,6 +2,114 @@
 
 import React, { useState, useRef, useCallback } from "react";
 
+// ─── PDF Viewer Modal ────────────────────────────────────────────────────────
+function PdfViewerModal({ file, onClose }) {
+    if (!file) return null;
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative w-[90vw] h-[90vh] max-w-5xl bg-[#111111] border border-white/10 rounded-2xl overflow-hidden flex flex-col shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] bg-[#0a0a0a]">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xl">📄</span>
+                        <p className="text-white font-semibold text-sm truncate">{file.name}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-white/40 hover:text-white/80 text-xs font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+                        >
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+                                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                            </svg>
+                            Open in new tab
+                        </a>
+                        <button
+                            onClick={onClose}
+                            className="text-white/40 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
+                        >
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {/* PDF iframe via Google Docs Viewer */}
+                <div className="flex-1 bg-[#1a1a1a] relative">
+                    <iframe
+                        src={`https://docs.google.com/gview?url=${encodeURIComponent(file.url)}&embedded=true`}
+                        title={file.name}
+                        className="w-full h-full border-0"
+                        style={{ minHeight: 0 }}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── Category Picker Modal ───────────────────────────────────────────────────
+function CategoryPickerModal({ categories, onSelect, onClose }) {
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative w-[480px] bg-[#111111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07] bg-[#0a0a0a]">
+                    <div>
+                        <p className="text-white font-semibold text-sm">Choose a Category</p>
+                        <p className="text-white/30 text-xs mt-0.5">Select where to upload your document</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-white/40 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
+                    >
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                    </button>
+                </div>
+                {/* Category grid */}
+                <div className="grid grid-cols-2 gap-3 p-5">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => onSelect(cat.id)}
+                            className="bg-[#1a1a1a] border border-white/[0.06] rounded-xl p-4 flex items-center gap-3 hover:border-white/20 hover:bg-[#1f1f1f] transition-all group text-left"
+                        >
+                            <div
+                                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
+                                style={{ backgroundColor: cat.accent + "25" }}
+                            >
+                                <span>{cat.icon}</span>
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-white font-semibold text-sm">{cat.name}</p>
+                                <p className="text-white/30 text-xs mt-0.5 truncate">{cat.description}</p>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ─── File type config ─────────────────────────────────────────────────────────
 const FILE_TYPES = {
     pdf: { bg: "bg-red-500/20", icon: "📄", color: "text-red-400", label: "PDF" },
@@ -23,58 +131,44 @@ const FILE_TYPES = {
 
 const CATEGORIES = [
     {
-        id: "lecture",
-        name: "Lecture Notes",
+        id: "academic",
+        name: "Academic",
         icon: "📂",
         bg: "bg-blue-900/60",
         accent: "#3b6ef8",
-        filter: (f) => ["pdf", "doc", "docx", "txt"].includes(f.ext),
+        description: "Notes, lectures & study material",
     },
     {
-        id: "research",
-        name: "Research Papers",
+        id: "exam",
+        name: "Exam",
         icon: "📑",
         bg: "bg-purple-900/60",
         accent: "#9b5de5",
-        filter: (f) => f.tag === "TEACHER",
+        description: "Past papers & exam prep",
     },
     {
-        id: "assignment",
-        name: "Assignment Briefs",
+        id: "personal",
+        name: "Personal",
         icon: "✅",
         bg: "bg-teal-900/60",
         accent: "#0fb58a",
-        filter: (f) => f.tag === "STUDENT",
+        description: "Personal docs & certificates",
     },
     {
-        id: "reference",
-        name: "Reference Books",
+        id: "career",
+        name: "Career",
         icon: "📚",
         bg: "bg-yellow-900/60",
         accent: "#f4a100",
-        filter: (f) => ["xls", "xlsx", "ppt", "pptx"].includes(f.ext),
+        description: "Resume, portfolio & career docs",
     },
 ];
 
 const INITIAL_FILES = [
-    {
-        id: 1, name: "Advanced_Physics_Notes.pdf", ext: "pdf",
-        tag: "TEACHER", date: "OCT 24, 2023", size: "12.4 MB",
-        avatars: ["RK", "PK", "DR"], extra: 3,
-    },
-    {
-        id: 2, name: "Lab_Report_Final.docx", ext: "docx",
-        tag: "STUDENT", date: "OCT 22, 2023", size: "2.1 MB",
-        avatars: ["PK"], extra: 0,
-    },
-    {
-        id: 3, name: "Circuit_Diagram_01.png", ext: "png",
-        tag: "TEACHER", date: "OCT 20, 2023", size: "5.8 MB",
-        avatars: ["DR"], extra: 0,
-    },
+    
 ];
 
-const TABS = ["ALL FILES", "MY UPLOADS", "TEACHER RESOURCES", "RECENT"];
+const TABS = ["ALL FILES", "MY UPLOADS", "TEACHER RESOURCES"];
 const SORT_OPTIONS = ["NAME", "DATE", "SIZE", "TYPE"];
 
 const AVATAR_COLORS = [
@@ -129,23 +223,81 @@ export default function VaultPage() {
     const [showSort, setShowSort] = useState(false);
     const [viewGrid, setViewGrid] = useState(true);
     const [dragging, setDragging] = useState(false);
+    const [viewingFile, setViewingFile] = useState(null);
+    const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+    const [pendingCategory, setPendingCategory] = useState(null);
+    const [activeCategoryView, setActiveCategoryView] = useState(null);
     const fileInputRef = useRef();
 
-    // ── Upload handler ──
-    const handleUpload = useCallback((uploadedFiles) => {
-        const newFiles = Array.from(uploadedFiles).map((f, i) => ({
-            id: Date.now() + i,
-            name: f.name,
-            ext: getExt(f.name),
-            tag: "MY UPLOADS",
-            date: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }).toUpperCase(),
-            size: formatSize(f.size),
-            avatars: ["ME"],
-            extra: 0,
-        }));
-        setFiles((prev) => [...newFiles, ...prev]);
-        setActiveTab("MY UPLOADS");
+    // ── Category selection → open file picker ──
+    const handleCategorySelect = useCallback((categoryId) => {
+        setPendingCategory(categoryId);
+        setShowCategoryPicker(false);
+        // Small delay to let modal close before opening file dialog
+        setTimeout(() => fileInputRef.current?.click(), 150);
     }, []);
+
+    // ── File click handler ──
+    const handleFileClick = useCallback((file) => {
+        if (!file.url) return;
+        if (file.ext === "pdf") {
+            setViewingFile(file);
+        } else {
+            window.open(file.url, "_blank");
+        }
+    }, []);
+
+    // ── Upload handler ──
+    const handleUpload = useCallback(async (uploadedFiles) => {
+        const category = pendingCategory;
+
+        const uploaded = await Promise.all(
+            Array.from(uploadedFiles).map(async (f, i) => {
+                const formData = new FormData();
+                formData.append("file", f);
+
+                try {
+                    const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!res.ok) {
+                        const errorData = await res.json().catch(() => ({}));
+                        throw new Error(errorData.error || "Upload failed");
+                    }
+
+                    const data = await res.json();
+
+                    return {
+                        id: Date.now() + i,
+                        name: f.name,
+                        ext: getExt(f.name),
+                        tag: "MY UPLOADS",
+                        category: category || "academic",
+                        date: new Date().toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                        }).toUpperCase(),
+                        size: formatSize(f.size),
+                        avatars: ["ME"],
+                        extra: 0,
+                        url: data.url,
+                    };
+                } catch (error) {
+                    console.error("Upload failed for file:", f.name, error);
+                    alert(`Failed to upload ${f.name}: ${error.message}`);
+                    return null;
+                }
+            })
+        );
+
+        setFiles((prev) => [...uploaded.filter(f => f !== null), ...prev]);
+        setPendingCategory(null);
+        // Jump to the category view that was just uploaded to
+        if (category) setActiveCategoryView(category);
+    }, [pendingCategory]);
 
     const onDrop = (e) => {
         e.preventDefault();
@@ -173,11 +325,16 @@ export default function VaultPage() {
         });
 
     // ── Category counts ──
-    const categoryFiles = CATEGORIES.map((cat) => {
-        const matches = files.filter(cat.filter);
+    const categoryData = CATEGORIES.map((cat) => {
+        const matches = files.filter((f) => f.category === cat.id);
         const totalMB = matches.reduce((acc, f) => acc + parseFloat(f.size || 0), 0);
-        return { ...cat, count: matches.length, size: totalMB.toFixed(1) + " MB" };
+        return { ...cat, count: matches.length, size: totalMB.toFixed(1) + " MB", files: matches };
     });
+
+    // ── Active category drill-down data ──
+    const activeCatData = activeCategoryView
+        ? categoryData.find((c) => c.id === activeCategoryView)
+        : null;
 
     return (
         <div
@@ -269,7 +426,7 @@ export default function VaultPage() {
 
                     {/* Upload */}
                     <button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => setShowCategoryPicker(true)}
                         className="flex items-center gap-2 bg-[#3b6ef8] hover:bg-[#2d5ce0] rounded-xl px-4 py-2.5 text-[11px] font-bold tracking-widest text-white transition-colors"
                     >
                         <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
@@ -284,11 +441,15 @@ export default function VaultPage() {
                         type="file"
                         multiple
                         className="hidden"
-                        onChange={(e) => e.target.files?.length && handleUpload(e.target.files)}
+                        onChange={(e) => {
+                            if (e.target.files?.length) handleUpload(e.target.files);
+                            e.target.value = '';
+                        }}
                     />
                 </div>
 
-                {/* ── Resource Categories ── */}
+                {/* ── Resource Categories (hidden on Teacher Resources tab) ── */}
+                {activeTab !== "TEACHER RESOURCES" && !activeCategoryView && (
                 <section>
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[11px] tracking-[0.2em] text-white/35 font-bold">RESOURCE CATEGORIES</h2>
@@ -297,9 +458,10 @@ export default function VaultPage() {
                         </button>
                     </div>
                     <div className="grid grid-cols-4 gap-4">
-                        {categoryFiles.map((cat) => (
+                        {categoryData.map((cat) => (
                             <div
                                 key={cat.id}
+                                onClick={() => setActiveCategoryView(cat.id)}
                                 className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors cursor-pointer group"
                             >
                                 <div className="flex items-start justify-between">
@@ -327,8 +489,101 @@ export default function VaultPage() {
                         ))}
                     </div>
                 </section>
+                )}
 
-                {/* ── Recent Files ── */}
+                {/* ── Category Drill-Down View ── */}
+                {activeCategoryView && activeCatData && (
+                <section className="flex-1 min-h-0 flex flex-col">
+                    {/* Back header */}
+                    <div className="flex items-center gap-3 mb-4">
+                        <button
+                            onClick={() => setActiveCategoryView(null)}
+                            className="flex items-center gap-2 text-white/40 hover:text-white/80 transition-colors text-sm"
+                        >
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Back
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <div
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
+                                style={{ backgroundColor: activeCatData.accent + "25" }}
+                            >
+                                <span>{activeCatData.icon}</span>
+                            </div>
+                            <h2 className="text-white font-semibold text-base">{activeCatData.name}</h2>
+                            <span className="text-white/30 text-xs ml-1">{activeCatData.count} files</span>
+                        </div>
+                    </div>
+
+                    {/* File list */}
+                    <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+                        {activeCatData.files.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 text-white/20">
+                                <span className="text-5xl mb-4">{activeCatData.icon}</span>
+                                <p className="text-sm">No files in {activeCatData.name} yet</p>
+                                <button
+                                    onClick={() => {
+                                        setPendingCategory(activeCatData.id);
+                                        setTimeout(() => fileInputRef.current?.click(), 100);
+                                    }}
+                                    className="mt-4 text-[#3b6ef8] hover:text-[#5a8aff] text-sm font-medium transition-colors"
+                                >
+                                    + Upload a file here
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 gap-4">
+                                {activeCatData.files.map((file) => (
+                                    <div
+                                        key={file.id}
+                                        onClick={() => handleFileClick(file)}
+                                        className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <FileIcon ext={file.ext} />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-white text-sm font-semibold truncate">{file.name}</p>
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    {file.tag && <TagBadge tag={file.tag} />}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-white/25 text-[11px] tracking-wider">
+                                            ADDED {file.date} • {file.size}
+                                        </p>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex -space-x-2">
+                                                {file.avatars.slice(0, 3).map((av, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className={`w-7 h-7 rounded-full ${getAvatarColor(av)} flex items-center justify-center text-[10px] font-bold text-white border-2 border-[#111]`}
+                                                    >
+                                                        {av}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button onClick={(e) => { e.stopPropagation(); if(file.url) window.open(file.url, '_blank'); }} className="text-white/30 hover:text-white transition-colors">
+                                                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                        <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                        <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </section>
+                )}
+
+                {/* ── Recent Files (hidden when category drill-down is active) ── */}
+                {!activeCategoryView && (
                 <section className="flex-1 min-h-0 flex flex-col">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[11px] tracking-[0.2em] text-white/35 font-bold">
@@ -378,7 +633,8 @@ export default function VaultPage() {
                                     return (
                                         <div
                                             key={file.id}
-                                            className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group"
+                                            onClick={() => handleFileClick(file)}
+                                            className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer"
                                         >
                                             {/* Header */}
                                             <div className="flex items-center gap-3">
@@ -440,7 +696,8 @@ export default function VaultPage() {
                                     return (
                                         <div
                                             key={file.id}
-                                            className="bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group"
+                                            onClick={() => handleFileClick(file)}
+                                            className="bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group cursor-pointer"
                                         >
                                             <FileIcon ext={file.ext} size="sm" />
                                             <div className="flex-1 min-w-0">
@@ -474,7 +731,20 @@ export default function VaultPage() {
                         )}
                     </div>
                 </section>
+                )}
             </div>
+
+            {/* ── PDF Viewer Modal ── */}
+            <PdfViewerModal file={viewingFile} onClose={() => setViewingFile(null)} />
+
+            {/* ── Category Picker Modal ── */}
+            {showCategoryPicker && (
+                <CategoryPickerModal
+                    categories={CATEGORIES}
+                    onSelect={handleCategorySelect}
+                    onClose={() => setShowCategoryPicker(false)}
+                />
+            )}
         </div>
     );
 }
