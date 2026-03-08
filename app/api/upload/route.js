@@ -5,6 +5,9 @@ export async function POST(req) {
   try {
     const data = await req.formData();
     const file = data.get("file");
+    const category = data.get("category") || "academic";
+    const originalName = data.get("originalName") || file?.name || "untitled";
+    const fileSize = data.get("fileSize") || "0";
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -16,8 +19,9 @@ export async function POST(req) {
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          resource_type: "raw", // important for documents
+          resource_type: "raw",
           folder: "documents",
+          context: `category=${category}|originalName=${originalName}|fileSize=${fileSize}`,
         },
         (error, result) => {
           if (error) reject(error);
@@ -31,6 +35,8 @@ export async function POST(req) {
     return NextResponse.json({
       url: result.secure_url,
       public_id: result.public_id,
+      created_at: result.created_at,
+      bytes: result.bytes,
     });
 
   } catch (error) {

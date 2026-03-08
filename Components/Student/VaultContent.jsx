@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 
 // ─── PDF Viewer Modal ────────────────────────────────────────────────────────
 function PdfViewerModal({ file, onClose }) {
@@ -227,7 +227,28 @@ export default function VaultPage() {
     const [showCategoryPicker, setShowCategoryPicker] = useState(false);
     const [pendingCategory, setPendingCategory] = useState(null);
     const [activeCategoryView, setActiveCategoryView] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
     const fileInputRef = useRef();
+
+    // ── Fetch files from Cloudinary on mount ──
+    const fetchFiles = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await fetch("/api/files");
+            if (!res.ok) throw new Error("Failed to fetch files");
+            const data = await res.json();
+            setFiles(data.files || []);
+        } catch (error) {
+            console.error("Error fetching files:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchFiles();
+    }, [fetchFiles]);
 
     // ── Category selection → open file picker ──
     const handleCategorySelect = useCallback((categoryId) => {
@@ -247,57 +268,63 @@ export default function VaultPage() {
         }
     }, []);
 
+    // ── Delete handler ──
+    const handleDelete = useCallback(async (e, file) => {
+        e.stopPropagation();
+        if (!confirm(`Delete "${file.name}"? This cannot be undone.`)) return;
+
+        setDeletingId(file.public_id);
+        try {
+            const res = await fetch("/api/files/delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ public_id: file.public_id }),
+            });
+
+            if (!res.ok) throw new Error("Delete failed");
+
+            setFiles((prev) => prev.filter((f) => f.public_id !== file.public_id));
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert(`Failed to delete ${file.name}`);
+        } finally {
+            setDeletingId(null);
+        }
+    }, []);
+
     // ── Upload handler ──
     const handleUpload = useCallback(async (uploadedFiles) => {
         const category = pendingCategory;
 
-        const uploaded = await Promise.all(
-            Array.from(uploadedFiles).map(async (f, i) => {
-                const formData = new FormData();
-                formData.append("file", f);
+        for (const f of Array.from(uploadedFiles)) {
+            const formData = new FormData();
+            formData.append("file", f);
+            formData.append("category", category || "academic");
+            formData.append("originalName", f.name);
+            formData.append("fileSize", String(f.size));
 
-                try {
-                    const res = await fetch("/api/upload", {
-                        method: "POST",
-                        body: formData,
-                    });
+            try {
+                const res = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData,
+                });
 
-                    if (!res.ok) {
-                        const errorData = await res.json().catch(() => ({}));
-                        throw new Error(errorData.error || "Upload failed");
-                    }
-
-                    const data = await res.json();
-
-                    return {
-                        id: Date.now() + i,
-                        name: f.name,
-                        ext: getExt(f.name),
-                        tag: "MY UPLOADS",
-                        category: category || "academic",
-                        date: new Date().toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "2-digit",
-                            year: "numeric",
-                        }).toUpperCase(),
-                        size: formatSize(f.size),
-                        avatars: ["ME"],
-                        extra: 0,
-                        url: data.url,
-                    };
-                } catch (error) {
-                    console.error("Upload failed for file:", f.name, error);
-                    alert(`Failed to upload ${f.name}: ${error.message}`);
-                    return null;
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.error || "Upload failed");
                 }
-            })
-        );
+            } catch (error) {
+                console.error("Upload failed for file:", f.name, error);
+                alert(`Failed to upload ${f.name}: ${error.message}`);
+            }
+        }
 
-        setFiles((prev) => [...uploaded.filter(f => f !== null), ...prev]);
+        // Re-fetch all files from Cloudinary to stay in sync
+        await fetchFiles();
         setPendingCategory(null);
         // Jump to the category view that was just uploaded to
         if (category) setActiveCategoryView(category);
-    }, [pendingCategory]);
+    }, [pendingCategory, fetchFiles]);
 
     const onDrop = (e) => {
         e.preventDefault();
@@ -539,7 +566,7 @@ export default function VaultPage() {
                                     <div
                                         key={file.id}
                                         onClick={() => handleFileClick(file)}
-                                        className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer"
+                                        className={`bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer ${deletingId === file.public_id ? 'opacity-50 pointer-events-none' : ''}`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <FileIcon ext={file.ext} />
@@ -570,6 +597,13 @@ export default function VaultPage() {
                                                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={(e) => handleDelete(e, file)} className="text-white/30 hover:text-red-400 transition-colors" title="Delete file">
+                                                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                                        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                                        <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                        <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                     </svg>
                                                 </button>
                                             </div>
@@ -620,7 +654,13 @@ export default function VaultPage() {
                     </div>
 
                     <div className="flex-1 min-h-0 overflow-y-auto pr-1">
-                        {filtered.length === 0 ? (
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-16 text-white/30">
+                                <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin mb-4" />
+                                <p className="text-sm">Loading files...</p>
+                            </div>
+                        ) :
+                        filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-white/20">
                                 <span className="text-5xl mb-4">🔍</span>
                                 <p className="text-sm">No files found for "{search}"</p>
@@ -634,7 +674,7 @@ export default function VaultPage() {
                                         <div
                                             key={file.id}
                                             onClick={() => handleFileClick(file)}
-                                            className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer"
+                                            className={`bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col gap-4 hover:border-white/15 transition-colors group cursor-pointer ${deletingId === file.public_id ? 'opacity-50 pointer-events-none' : ''}`}
                                         >
                                             {/* Header */}
                                             <div className="flex items-center gap-3">
@@ -667,19 +707,18 @@ export default function VaultPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <button className="text-white/30 hover:text-white transition-colors">
+                                                    <button onClick={(e) => { e.stopPropagation(); if(file.url) window.open(file.url, '_blank'); }} className="text-white/30 hover:text-white transition-colors">
                                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                                                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                             <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                             <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         </svg>
                                                     </button>
-                                                    <button className="text-white/30 hover:text-white transition-colors">
+                                                    <button onClick={(e) => handleDelete(e, file)} className="text-white/30 hover:text-red-400 transition-colors" title="Delete file">
                                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                                            <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                            <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                            <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" strokeWidth="1.8" />
+                                                            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                                            <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                            <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         </svg>
                                                     </button>
                                                 </div>
@@ -697,7 +736,7 @@ export default function VaultPage() {
                                         <div
                                             key={file.id}
                                             onClick={() => handleFileClick(file)}
-                                            className="bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group cursor-pointer"
+                                            className={`bg-[#111111] border border-white/[0.06] rounded-xl px-4 py-3 flex items-center gap-4 hover:border-white/15 transition-colors group cursor-pointer ${deletingId === file.public_id ? 'opacity-50 pointer-events-none' : ''}`}
                                         >
                                             <FileIcon ext={file.ext} size="sm" />
                                             <div className="flex-1 min-w-0">
@@ -708,19 +747,18 @@ export default function VaultPage() {
                                             </div>
                                             {file.tag && <TagBadge tag={file.tag} />}
                                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                <button className="text-white/30 hover:text-white transition-colors">
+                                                <button onClick={(e) => { e.stopPropagation(); if(file.url) window.open(file.url, '_blank'); }} className="text-white/30 hover:text-white transition-colors">
                                                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
                                                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                         <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                     </svg>
                                                 </button>
-                                                <button className="text-white/30 hover:text-white transition-colors">
+                                                <button onClick={(e) => handleDelete(e, file)} className="text-white/30 hover:text-red-400 transition-colors" title="Delete file">
                                                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                                        <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                        <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                        <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.8" />
-                                                        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" strokeWidth="1.8" />
+                                                        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                                        <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                                                        <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                                                     </svg>
                                                 </button>
                                             </div>
