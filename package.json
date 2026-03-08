@@ -12,6 +12,7 @@
     "@splinetool/react-spline": "^4.1.0",
     "cloudinary": "^2.9.0",
     "dembrandt": "^0.6.1",
+    "init": "^0.1.2",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",
