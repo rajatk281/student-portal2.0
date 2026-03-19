@@ -1,0 +1,46 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+model Student {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  username  String?
+  role      Role     @default(Student)
+  password  String? 
+  consistency Float @default(0.0)
+  GPA       Float @default(0.0)
+  attendances Attendance[]
+  
+}
+
+model Subject {
+  id        Int          @id @default(autoincrement())
+  name      String
+  code      String       @unique
+  attendances Attendance[]
+}
+
+model Attendance {
+  id         Int      @id @default(autoincrement())
+  studentId  Int
+  subjectId  Int
+  attended   Int      @default(0)
+  total      Int      @default(0)
+
+  student    Student  @relation(fields: [studentId], references: [id])
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+
+  @@unique([studentId, subjectId]) // one record per subject per student
+}
+
+enum Role {
+  Student
+  Teacher
+}
