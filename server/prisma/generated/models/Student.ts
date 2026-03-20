@@ -47,6 +47,7 @@ export type StudentMinAggregateOutputType = {
   password: string | null
   consistency: number | null
   GPA: number | null
+  date: Date | null
 }
 
 export type StudentMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type StudentMaxAggregateOutputType = {
   password: string | null
   consistency: number | null
   GPA: number | null
+  date: Date | null
 }
 
 export type StudentCountAggregateOutputType = {
@@ -69,6 +71,7 @@ export type StudentCountAggregateOutputType = {
   password: number
   consistency: number
   GPA: number
+  date: number
   _all: number
 }
 
@@ -94,6 +97,7 @@ export type StudentMinAggregateInputType = {
   password?: true
   consistency?: true
   GPA?: true
+  date?: true
 }
 
 export type StudentMaxAggregateInputType = {
@@ -105,6 +109,7 @@ export type StudentMaxAggregateInputType = {
   password?: true
   consistency?: true
   GPA?: true
+  date?: true
 }
 
 export type StudentCountAggregateInputType = {
@@ -116,6 +121,7 @@ export type StudentCountAggregateInputType = {
   password?: true
   consistency?: true
   GPA?: true
+  date?: true
   _all?: true
 }
 
@@ -214,6 +220,7 @@ export type StudentGroupByOutputType = {
   password: string | null
   consistency: number
   GPA: number
+  date: Date
   _count: StudentCountAggregateOutputType | null
   _avg: StudentAvgAggregateOutputType | null
   _sum: StudentSumAggregateOutputType | null
@@ -248,6 +255,7 @@ export type StudentWhereInput = {
   password?: Prisma.StringNullableFilter<"Student"> | string | null
   consistency?: Prisma.FloatFilter<"Student"> | number
   GPA?: Prisma.FloatFilter<"Student"> | number
+  date?: Prisma.DateTimeFilter<"Student"> | Date | string
   attendances?: Prisma.AttendanceListRelationFilter
 }
 
@@ -260,6 +268,7 @@ export type StudentOrderByWithRelationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   consistency?: Prisma.SortOrder
   GPA?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   attendances?: Prisma.AttendanceOrderByRelationAggregateInput
 }
 
@@ -275,6 +284,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringNullableFilter<"Student"> | string | null
   consistency?: Prisma.FloatFilter<"Student"> | number
   GPA?: Prisma.FloatFilter<"Student"> | number
+  date?: Prisma.DateTimeFilter<"Student"> | Date | string
   attendances?: Prisma.AttendanceListRelationFilter
 }, "id" | "email">
 
@@ -287,6 +297,7 @@ export type StudentOrderByWithAggregationInput = {
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   consistency?: Prisma.SortOrder
   GPA?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   _count?: Prisma.StudentCountOrderByAggregateInput
   _avg?: Prisma.StudentAvgOrderByAggregateInput
   _max?: Prisma.StudentMaxOrderByAggregateInput
@@ -306,6 +317,7 @@ export type StudentScalarWhereWithAggregatesInput = {
   password?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
   consistency?: Prisma.FloatWithAggregatesFilter<"Student"> | number
   GPA?: Prisma.FloatWithAggregatesFilter<"Student"> | number
+  date?: Prisma.DateTimeWithAggregatesFilter<"Student"> | Date | string
 }
 
 export type StudentCreateInput = {
@@ -316,6 +328,7 @@ export type StudentCreateInput = {
   password?: string | null
   consistency?: number
   GPA?: number
+  date?: Date | string
   attendances?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
 }
 
@@ -328,6 +341,7 @@ export type StudentUncheckedCreateInput = {
   password?: string | null
   consistency?: number
   GPA?: number
+  date?: Date | string
   attendances?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
 }
 
@@ -339,6 +353,7 @@ export type StudentUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendances?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
 }
 
@@ -351,6 +366,7 @@ export type StudentUncheckedUpdateInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attendances?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
 }
 
@@ -363,6 +379,7 @@ export type StudentCreateManyInput = {
   password?: string | null
   consistency?: number
   GPA?: number
+  date?: Date | string
 }
 
 export type StudentUpdateManyMutationInput = {
@@ -373,6 +390,7 @@ export type StudentUpdateManyMutationInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StudentUncheckedUpdateManyInput = {
@@ -384,6 +402,7 @@ export type StudentUncheckedUpdateManyInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StudentCountOrderByAggregateInput = {
@@ -395,6 +414,7 @@ export type StudentCountOrderByAggregateInput = {
   password?: Prisma.SortOrder
   consistency?: Prisma.SortOrder
   GPA?: Prisma.SortOrder
+  date?: Prisma.SortOrder
 }
 
 export type StudentAvgOrderByAggregateInput = {
@@ -412,6 +432,7 @@ export type StudentMaxOrderByAggregateInput = {
   password?: Prisma.SortOrder
   consistency?: Prisma.SortOrder
   GPA?: Prisma.SortOrder
+  date?: Prisma.SortOrder
 }
 
 export type StudentMinOrderByAggregateInput = {
@@ -423,6 +444,7 @@ export type StudentMinOrderByAggregateInput = {
   password?: Prisma.SortOrder
   consistency?: Prisma.SortOrder
   GPA?: Prisma.SortOrder
+  date?: Prisma.SortOrder
 }
 
 export type StudentSumOrderByAggregateInput = {
@@ -490,6 +512,7 @@ export type StudentCreateWithoutAttendancesInput = {
   password?: string | null
   consistency?: number
   GPA?: number
+  date?: Date | string
 }
 
 export type StudentUncheckedCreateWithoutAttendancesInput = {
@@ -501,6 +524,7 @@ export type StudentUncheckedCreateWithoutAttendancesInput = {
   password?: string | null
   consistency?: number
   GPA?: number
+  date?: Date | string
 }
 
 export type StudentCreateOrConnectWithoutAttendancesInput = {
@@ -527,6 +551,7 @@ export type StudentUpdateWithoutAttendancesInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type StudentUncheckedUpdateWithoutAttendancesInput = {
@@ -538,6 +563,7 @@ export type StudentUncheckedUpdateWithoutAttendancesInput = {
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   consistency?: Prisma.FloatFieldUpdateOperationsInput | number
   GPA?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -580,6 +606,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   password?: boolean
   consistency?: boolean
   GPA?: boolean
+  date?: boolean
   attendances?: boolean | Prisma.Student$attendancesArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
@@ -593,6 +620,7 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   password?: boolean
   consistency?: boolean
   GPA?: boolean
+  date?: boolean
 }, ExtArgs["result"]["student"]>
 
 export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -604,6 +632,7 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   password?: boolean
   consistency?: boolean
   GPA?: boolean
+  date?: boolean
 }, ExtArgs["result"]["student"]>
 
 export type StudentSelectScalar = {
@@ -615,9 +644,10 @@ export type StudentSelectScalar = {
   password?: boolean
   consistency?: boolean
   GPA?: boolean
+  date?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "email" | "username" | "role" | "password" | "consistency" | "GPA", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "email" | "username" | "role" | "password" | "consistency" | "GPA" | "date", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attendances?: boolean | Prisma.Student$attendancesArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
@@ -639,6 +669,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     password: string | null
     consistency: number
     GPA: number
+    date: Date
   }, ExtArgs["result"]["student"]>
   composites: {}
 }
@@ -1071,6 +1102,7 @@ export interface StudentFieldRefs {
   readonly password: Prisma.FieldRef<"Student", 'String'>
   readonly consistency: Prisma.FieldRef<"Student", 'Float'>
   readonly GPA: Prisma.FieldRef<"Student", 'Float'>
+  readonly date: Prisma.FieldRef<"Student", 'DateTime'>
 }
     
 

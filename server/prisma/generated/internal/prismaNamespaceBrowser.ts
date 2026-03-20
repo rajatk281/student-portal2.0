@@ -80,7 +80,8 @@ export const StudentScalarFieldEnum = {
   role: 'role',
   password: 'password',
   consistency: 'consistency',
-  GPA: 'GPA'
+  GPA: 'GPA',
+  date: 'date'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]

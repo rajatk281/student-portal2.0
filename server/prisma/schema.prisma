@@ -16,6 +16,7 @@ model Student {
   password  String? 
   consistency Float @default(0.0)
   GPA       Float @default(0.0)
+  date       DateTime @default(now())
   attendances Attendance[]
   
 }

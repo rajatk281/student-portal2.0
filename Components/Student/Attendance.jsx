@@ -339,13 +339,26 @@ export default function AttendancePage() {
         });
     };
 
-    const handleMarkSubject = (dateStr, subId, status) => {
-        updateDayRecord(dateStr, (rec) => {
-            if (status === null) delete rec.attendance[subId];
-            else rec.attendance[subId] = status;
-            return rec;
-        });
-    };
+    const handleMarkSubject = async (dateStr, studentId, subId, status) => {
+  try {
+    await fetch("/api/attendance", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        studentId: studentId, // 🔥 replace with logged-in user
+        subjectId: subId,
+        status,
+        date: dateStr,
+      }),
+    })
+
+    // OPTIONAL: update UI locally
+  } catch (error) {
+    console.error("Error saving attendance:", error)
+  }
+}
 
     const handleAddSubjectToDay = (dateStr, subId) => {
         updateDayRecord(dateStr, (rec) => {
@@ -478,13 +491,13 @@ export default function AttendancePage() {
                                                         <span className="text-sm font-semibold text-white/90">{sub.name}</span>
                                                         <div className="flex items-center gap-2">
                                                             <button 
-                                                                onClick={() => handleMarkSubject(activeDateInfo.dateStr, sub.id, status === 'present' ? null : 'present')}
+                                                                onClick={() => handleMarkSubject(activeDateInfo.dateStr, 1, sub.id, status === 'present' ? null : 'present')}
                                                                 className={`px-3 py-1 text-xs rounded-md transition-all font-semibold ${status === 'present' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
                                                             >
                                                                 Present
                                                             </button>
                                                             <button 
-                                                                onClick={() => handleMarkSubject(activeDateInfo.dateStr, sub.id, status === 'absent' ? null : 'absent')}
+                                                                onClick={() => handleMarkSubject(activeDateInfo.dateStr, 1, sub.id, status === 'absent' ? null : 'absent')}
                                                                 className={`px-3 py-1 text-xs rounded-md transition-all font-semibold ${status === 'absent' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
                                                             >
                                                                 Absent
